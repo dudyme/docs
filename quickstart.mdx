@@ -1,86 +1,144 @@
 ---
-title: 'Quickstart'
-description: 'Start building awesome documentation in under 5 minutes'
+title: 'Quick Start'
+description: 'Learn how to start using Call24x7.AI and make your first AI-driven call'
 ---
 
-## Setup your development
+<img
+  className="block dark:hidden mx-auto my-4"
+  src="/images/hero-light.svg"
+  alt="Hero Light"
+/>
+<img
+  className="hidden dark:block mx-auto my-4"
+  src="/images/hero-dark.svg"
+  alt="Hero Dark"
+/>
 
-Learn how to update your docs locally and deploy them to the public.
+<Info>
+  **Prerequisite**: Ensure you have a registered developer account with Call24x7.AI and an API key.
+</Info>
 
-### Edit and preview
+## Step 1: Creating Your Developer Account
+
+Head to the Call24x7.AI [Developer Portal](https://call24x7.ai/developer) to create an account. Complete your details, verify your phone number, and access your account dashboard.
+
+Once registered, navigate to the **Send Call** page to test sending a call directly from the portal.
+
+<CodeGroup>
+  <Code title="Setup your API key" active>
+
+```bash
+# Replace "your_api_key_here" with your actual API key
+export CALL24X7_API_KEY="your_api_key_here"
+```
+
+  </Code>
+</CodeGroup>
+
+## Step 2: Sending Your First Phone Call
+
+Our user-friendly portal lets you configure and test your calls right from the interface.
+
+### Instructions
+1. **Enter the Recipient’s Number**: Specify the target phone number for the call.
+2. **Compose Your Prompt**: Write a personalized prompt or select an example for the AI agent to deliver.
+3. **Send the Call**: Press "Send Call" to initiate. You’ll receive a confirmation when the call connects.
+
+<Alert type="warning">
+  **Billing Note**: Calls are billed at $0.15 per minute, with precise second-by-second billing.
+</Alert>
+
+## Step 3: Testing Your AI Call Agent
+
+After placing your call, you can use our test suite to simulate various call scenarios and refine responses for high-quality interactions.
+
+<Steps>
+  <Step title="Set up Testing Suite" icon="flask">
+    Access the testing environment, choose the language and model, and input your AI prompt.
+  </Step>
+  <Step title="Simulate Calls" icon="phone">
+    Interact with the AI agent and test with diverse scenarios to evaluate response quality.
+  </Step>
+  <Step title="Refine the Prompt" icon="edit">
+    Update and adjust your prompt based on call responses to ensure clarity and relevance.
+  </Step>
+</Steps>
+
+<Divider />
+
+## Advanced Options
+
+### Custom Ports
+By default, the Call24x7.AI testing suite operates on port 3000. To use a different port, run the following command:
+
+```bash
+call24x7 dev --port 3333
+```
+
+### Troubleshooting
+If you encounter setup issues, consult our troubleshooting guide below.
+
+## Deployment
+
+<Tip>
+  Deployment is seamless! Unlimited editors are available under the [Pro Plan](https://call24x7.ai/pricing).
+</Tip>
+
+Once deployed, successful deployment will display the following confirmation:
+
+<Frame>
+  <img src="/images/checks-passed.png" style={{ borderRadius: "0.5rem" }} />
+</Frame>
+
+## Troubleshooting Guide
 
 <AccordionGroup>
-  <Accordion icon="github" title="Clone your docs locally">
-    During the onboarding process, we created a repository on your Github with
-    your docs content. You can find this repository on our
-    [dashboard](https://dashboard.mintlify.com). To clone the repository
-    locally, follow these
-    [instructions](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
-    in your terminal.
+  <Accordion title="Call24x7.AI is Not Loading">
+    Ensure you have Node.js v18 or higher. Run `call24x7 install` and try again.
   </Accordion>
-  <Accordion icon="rectangle-terminal" title="Preview changes">
-    Previewing helps you make sure your changes look as intended. We built a
-    command line interface to render these changes locally. 1. Install the
-    [Mintlify CLI](https://www.npmjs.com/package/mintlify) to preview the
-    documentation changes locally with this command: ``` npm i -g mintlify ```
-    2. Run the following command at the root of your documentation (where
-    `mint.json` is): ``` mintlify dev ```
+  <Accordion title="Missing Directory Error">
+    Navigate to the Call24x7.AI directory, remove the `.call24x7` folder, and rerun `call24x7 dev`.
+  </Accordion>
+  <Accordion title="Unknown Errors">
+    For persistent issues, delete the `.call24x7` folder from your root directory and restart `call24x7 dev`.
   </Accordion>
 </AccordionGroup>
 
-### Deploy your changes
+## Next Steps
 
-<AccordionGroup>
+Now that you've successfully sent your first call and tested your AI agent, explore further with these resources:
 
-<Accordion icon="message-bot" title="Install our Github app">
-  Our Github app automatically deploys your changes to your docs site, so you
-  don't need to manage deployments yourself. You can find the link to install on
-  your [dashboard](https://dashboard.mintlify.com). Once the bot has been
-  successfully installed, there should be a check mark next to the commit hash
-  of the repo.
-</Accordion>
-<Accordion icon="rocket" title="Push your changes">
-  [Commit and push your changes to
-  Git](https://docs.github.com/en/get-started/using-git/pushing-commits-to-a-remote-repository#about-git-push)
-  for your changes to update in your docs site. If you push and don't see that
-  the Github app successfully deployed your changes, you can also manually
-  update your docs through our [dashboard](https://dashboard.mintlify.com).
-</Accordion>
-
-</AccordionGroup>
-
-## Update your docs
-
-Add content directly in your files with MDX syntax and React components. You can use any of our components, or even build your own.
-
-<CardGroup>
-
-<Card title="Style Your Docs" icon="paintbrush" href="/settings/global">
-  Add flair to your docs with personalized branding.
-</Card>
-
-<Card
-  title="Add API Endpoints"
-  icon="square-code"
-  href="/api-playground/configuration"
->
-  Implement your OpenAPI spec and enable API user interaction.
-</Card>
-
-<Card
-  title="Integrate Analytics"
-  icon="chart-mixed"
-  href="/analytics/supported-integrations"
->
-  Draw insights from user interactions with your documentation.
-</Card>
-
-<Card
-  title="Host on a Custom Domain"
-  icon="browser"
-  href="/settings/custom-domain/subdomain"
->
-  Keep your docs on your own website's subdomain.
-</Card>
-
+<CardGroup cols={2}>
+  <Card
+    title="API Reference"
+    icon="book"
+    href="/docs/api-reference"
+  >
+    Detailed API documentation for integrating and customizing calls.
+  </Card>
+  <Card
+    title="Advanced Tools"
+    icon="tools"
+    href="/docs/custom-tools"
+  >
+    Create custom tools to interact with external APIs live during calls.
+  </Card>
+  <Card
+    title="Prompting Guide"
+    icon="lightbulb"
+    href="/docs/prompting-guide"
+  >
+    Learn effective prompt strategies to achieve desired behaviors from your AI agent.
+  </Card>
+  <Card
+    title="Community Support"
+    icon="users"
+    href="/community"
+  >
+    Connect with other developers and get support in the Call24x7.AI community.
+  </Card>
 </CardGroup>
+
+<Callout title="Need Assistance?" type="success">
+Our support team is here to help! Visit our [Help Center](https://call24x7.ai/help) or reach out directly for assistance.
+</Callout>
