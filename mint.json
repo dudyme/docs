@@ -54,7 +54,9 @@
       "pages": [
         "introduction",
         "quickstart",
-         "introduction"
+         "introduction",
+        "pi-reference/introduction",
+        "No Code Integration (Make.com)"
       ]
     },
     {
