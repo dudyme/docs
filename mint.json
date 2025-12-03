@@ -23,7 +23,7 @@
   ],
   "topbarCtaButton": {
     "name": "Dashboard",
-    "url": "https://call24x7.ai/developer"
+    "url": "https://manage.call24x7.ai"
   },
   "tabs": [
     {
@@ -40,7 +40,7 @@
     {
       "name": "Developer Portal",
       "icon": "code",
-      "url": "https://call24x7.ai/developer"
+      "url": "https://manage.call24x7.ai"
     },
     {
       "name": "Help Center",
