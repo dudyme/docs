@@ -35,7 +35,7 @@
     {
       "name": "Documentation",
       "icon": "book-open-cover",
-      "url": "https://docs.call24x7.ai"
+      "url": "https://doc.call24x7.ai"
     },
     {
       "name": "Developer Portal",
@@ -45,7 +45,7 @@
     {
       "name": "Help Center",
       "icon": "question-circle",
-      "url": "https://call24x7.ai/help"
+      "url": "https://manage.call24x7.ai"
     }
   ],
   "navigation": [
