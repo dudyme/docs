@@ -1,15 +1,16 @@
 ---
-title: 'Quick Start'
-description: 'Learn how to start using Call24x7.AI and make your first AI-driven call'
+title: "Quick Start"
+description: "Learn how to start using Call24x7.AI and make your first AI-driven Phone Agent"
 ---
 
 <img
-  className="block dark:hidden mx-auto my-4"
+  className="block dark:hidden my-4 mx-auto"
   src="/images/hero-light.svg"
   alt="Hero Light"
 />
+
 <img
-  className="hidden dark:block mx-auto my-4"
+  className="hidden dark:block my-4 mx-auto"
   src="/images/hero-dark.svg"
   alt="Hero Dark"
 />
@@ -25,14 +26,12 @@ Head to the Call24x7.AI [Developer Portal](https://call24x7.ai/developer) to cre
 Once registered, navigate to the **Send Call** page to test sending a call directly from the portal.
 
 <CodeGroup>
-  <Code title="Setup your API key" active>
 
-```bash
+```
 # Replace "your_api_key_here" with your actual API key
 export CALL24X7_API_KEY="your_api_key_here"
 ```
 
-  </Code>
 </CodeGroup>
 
 ## Step 2: Sending Your First Phone Call
@@ -40,6 +39,7 @@ export CALL24X7_API_KEY="your_api_key_here"
 Our user-friendly portal lets you configure and test your calls right from the interface.
 
 ### Instructions
+
 1. **Enter the Recipient’s Number**: Specify the target phone number for the call.
 2. **Compose Your Prompt**: Write a personalized prompt or select an example for the AI agent to deliver.
 3. **Send the Call**: Press "Send Call" to initiate. You’ll receive a confirmation when the call connects.
@@ -69,6 +69,7 @@ After placing your call, you can use our test suite to simulate various call sce
 ## Advanced Options
 
 ### Custom Ports
+
 By default, the Call24x7.AI testing suite operates on port 3000. To use a different port, run the following command:
 
 ```bash
@@ -76,6 +77,7 @@ call24x7 dev --port 3333
 ```
 
 ### Troubleshooting
+
 If you encounter setup issues, consult our troubleshooting guide below.
 
 ## Deployment
@@ -87,7 +89,10 @@ If you encounter setup issues, consult our troubleshooting guide below.
 Once deployed, successful deployment will display the following confirmation:
 
 <Frame>
-  <img src="/images/checks-passed.png" style={{ borderRadius: "0.5rem" }} />
+  <img
+    src="/images/checks-passed.png"
+    style={{ borderRadius:"0.5rem" }}
+  />
 </Frame>
 
 ## Troubleshooting Guide
@@ -109,36 +114,20 @@ Once deployed, successful deployment will display the following confirmation:
 Now that you've successfully sent your first call and tested your AI agent, explore further with these resources:
 
 <CardGroup cols={2}>
-  <Card
-    title="API Reference"
-    icon="book"
-    href="/docs/api-reference"
-  >
+  <Card title="API Reference" icon="book" href="/docs/api-reference">
     Detailed API documentation for integrating and customizing calls.
   </Card>
-  <Card
-    title="Advanced Tools"
-    icon="tools"
-    href="/docs/custom-tools"
-  >
+  <Card title="Advanced Tools" icon="tools" href="/docs/custom-tools">
     Create custom tools to interact with external APIs live during calls.
   </Card>
-  <Card
-    title="Prompting Guide"
-    icon="lightbulb"
-    href="/docs/prompting-guide"
-  >
+  <Card title="Prompting Guide" icon="lightbulb" href="/docs/prompting-guide">
     Learn effective prompt strategies to achieve desired behaviors from your AI agent.
   </Card>
-  <Card
-    title="Community Support"
-    icon="users"
-    href="/community"
-  >
+  <Card title="Community Support" icon="users" href="/community">
     Connect with other developers and get support in the Call24x7.AI community.
   </Card>
 </CardGroup>
 
-<Callout title="Need Assistance?" type="success">
-Our support team is here to help! Visit our [Help Center](https://call24x7.ai/help) or reach out directly for assistance.
-</Callout>
+<success>
+  Our support team is here to help! Visit our [Help Center](https://call24x7.ai/help) or reach out directly for assistance.
+</success>
