@@ -1,0 +1,269 @@
+---
+title: 'Agents'
+description: 'Creating and managing AI agents for phone calls'
+icon: 'robot'
+---
+
+## Overview
+
+AI agents are the "personalities" that handle your phone calls. Each agent has its own instructions, voice, and behavior configuration. This guide explains how to create, configure, and manage agents.
+
+## What is an Agent?
+
+An agent is a configured AI assistant that:
+
+- Handles phone conversations automatically
+- Follows specific instructions you provide
+- Uses a selected voice model
+- Operates in a specified language
+- Can extract structured data from conversations
+
+## Creating an Agent
+
+### Using the Developer Portal
+
+1. Navigate to the **Agents** section
+2. Click **Create New Agent**
+3. Fill in the agent configuration:
+   - **Name**: Descriptive name for your agent
+   - **Instruction**: The prompt that defines agent behavior
+   - **Voice**: Select a voice model
+   - **Language**: Choose the conversation language
+4. Click **Save**
+
+### Using the API
+
+You can create agents programmatically using the API (if available) or use temporary agents by providing an `instruction` when making calls.
+
+## Agent Instructions
+
+The instruction (or prompt) is the most important part of your agent. It defines:
+
+- How the agent behaves
+- What the agent says
+- How the agent responds to different situations
+- What information to collect
+
+### Writing Effective Instructions
+
+<CodeGroup>
+
+```text Good Example
+You are a friendly customer service representative for ABC Company.
+
+Your role is to:
+- Greet customers warmly and professionally
+- Answer questions about our products and services
+- Schedule appointments when requested
+- Collect customer feedback
+- Be helpful, patient, and professional at all times
+
+If the customer asks about pricing, provide our standard rates and offer to schedule a consultation.
+If they want to schedule an appointment, collect their preferred date and time.
+```
+
+```text Bad Example
+Call customer. Ask about order.
+```
+
+</CodeGroup>
+
+### Best Practices
+
+1. **Be Specific**: Clearly define the agent's role and responsibilities
+2. **Set Boundaries**: Specify what the agent should and shouldn't do
+3. **Provide Examples**: Include example responses for common scenarios
+4. **Define Goals**: State what the agent should accomplish
+5. **Handle Edge Cases**: Include instructions for unexpected situations
+
+## Agent Configuration
+
+### Voice Selection
+
+Choose a voice that matches your brand and use case:
+
+- **Professional**: For business and customer service
+- **Friendly**: For sales and marketing
+- **Calm**: For support and troubleshooting
+- **Energetic**: For promotions and announcements
+
+### Language Settings
+
+Select the primary language for conversations. The agent will:
+
+- Speak in the selected language
+- Understand responses in that language
+- Adapt to regional variations when possible
+
+## Temporary Agents
+
+You can create temporary agents on-the-fly by providing an `instruction` when making a call:
+
+```bash
+curl -X POST https://api.call24x7.ai/outbound_call \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "to_phone_number": "+1234567890",
+    "instruction": "You are a friendly appointment reminder assistant. Remind the customer about their appointment tomorrow at 2 PM."
+  }'
+```
+
+<Info>
+  Temporary agents are useful for one-off calls or testing, but persistent agents are recommended for production use.
+</Info>
+
+## Structured Data Extraction
+
+Agents can extract structured data from conversations using `output_parameters`:
+
+### Example: Appointment Scheduling
+
+```json
+{
+  "to_phone_number": "+1234567890",
+  "agent_id": "agent-123",
+  "output_parameters": "{\"appointment_date\": null, \"appointment_time\": null, \"customer_name\": null}"
+}
+```
+
+The agent will extract these fields during the conversation, and they'll be included in the webhook payload when the call completes.
+
+### Output Parameters Template
+
+Define the structure you want to extract:
+
+```json
+{
+  "appointment_scheduled": false,
+  "appointment_date": null,
+  "appointment_time": null,
+  "customer_name": null,
+  "phone_number": null,
+  "notes": null
+}
+```
+
+## Agent Management
+
+### Updating Agents
+
+You can update agent configurations through:
+
+- **Developer Portal**: Edit agent settings in the web interface
+- **API**: Update agents programmatically (if supported)
+
+### Testing Agents
+
+Before using an agent in production:
+
+1. Test with your own phone number
+2. Try different conversation scenarios
+3. Verify the agent follows instructions correctly
+4. Check that data extraction works as expected
+
+### Agent Analytics
+
+Monitor agent performance:
+
+- **Call success rate**: Percentage of successful calls
+- **Average duration**: Average call length
+- **Goal completion**: How often agents achieve their objectives
+- **Customer satisfaction**: Feedback and ratings
+
+## Common Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Customer Service" icon="headset">
+    Handle customer inquiries, support requests, and troubleshooting
+  </Card>
+  <Card title="Appointment Scheduling" icon="calendar">
+    Schedule and confirm appointments automatically
+  </Card>
+  <Card title="Lead Qualification" icon="user-check">
+    Qualify leads and collect contact information
+  </Card>
+  <Card title="Order Confirmation" icon="shopping-cart">
+    Confirm orders and provide delivery updates
+  </Card>
+  <Card title="Survey Collection" icon="clipboard-list">
+    Conduct surveys and collect feedback
+  </Card>
+  <Card title="Reminders" icon="bell">
+    Send reminders for appointments and deadlines
+  </Card>
+</CardGroup>
+
+## Best Practices
+
+1. **Start Simple**: Begin with basic instructions and refine over time
+2. **Test Thoroughly**: Test agents with various scenarios before production
+3. **Iterate**: Continuously improve instructions based on call results
+4. **Monitor Performance**: Track metrics and adjust as needed
+5. **Handle Errors**: Include error handling in your instructions
+6. **Set Expectations**: Clearly communicate what the agent can and cannot do
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Agent not following instructions">
+    - Review and refine your instructions
+    - Be more specific about desired behavior
+    - Add examples of correct responses
+    - Test with different phrasings
+  </Accordion>
+  <Accordion title="Agent too verbose or too brief">
+    - Add explicit instructions about response length
+    - Specify when to ask follow-up questions
+    - Define when to end the conversation
+  </Accordion>
+  <Accordion title="Data extraction not working">
+    - Verify output_parameters structure is correct
+    - Ensure instructions mention what data to collect
+    - Test with clear examples
+    - Check webhook payload for extracted data
+  </Accordion>
+</AccordionGroup>
+
+## Examples
+
+### Customer Support Agent
+
+```
+You are a customer support agent for TechCorp.
+
+When a customer calls:
+1. Greet them warmly: "Hello! Thank you for calling TechCorp support. How can I help you today?"
+2. Listen carefully to their issue
+3. Ask clarifying questions if needed
+4. Provide solutions or escalate if necessary
+5. Confirm the issue is resolved before ending the call
+
+Be patient, empathetic, and professional. If you cannot resolve the issue, offer to have a human agent call them back.
+```
+
+### Appointment Scheduler
+
+```
+You are an appointment scheduling assistant.
+
+Your goal is to schedule appointments for our medical practice.
+
+Process:
+1. Greet the caller
+2. Ask for their preferred date and time
+3. Check availability
+4. Confirm the appointment details
+5. Collect their name and phone number for confirmation
+
+Be flexible with scheduling and offer alternative times if the requested slot is unavailable.
+```
+
+## Support
+
+For agent-related questions:
+
+- Check the [Getting Started Guide](/essentials/getting-started)
+- Visit our [Help Center](https://call24x7.ai/help)
+- Contact support: support@call24x7.ai
+

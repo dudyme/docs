@@ -1,4 +1,124 @@
 ---
-title: 'Delete Plant'
-openapi: 'DELETE /plants/{id}'
+title: 'Handle Inbound Call'
+openapi: 'POST /inbound_call'
 ---
+
+## Overview
+
+Process an incoming call from Twilio. This endpoint is typically called by Twilio webhooks when a call is received on a configured phone number. The endpoint returns TwiML XML to instruct Twilio how to handle the call.
+
+## Query Parameters
+
+<ParamField body="query" name="agent_id" type="string">
+  ID of the AI agent to handle the inbound call. Can also be provided in the request body or determined from the ForwardedFrom phone number.
+</ParamField>
+
+## Request Body
+
+This endpoint accepts `application/x-www-form-urlencoded` data from Twilio webhooks.
+
+<ParamField body="body" name="CallSid" type="string" required>
+  Twilio call SID (automatically provided by Twilio)
+</ParamField>
+
+<ParamField body="body" name="From" type="string" required>
+  Caller's phone number (automatically provided by Twilio)
+</ParamField>
+
+<ParamField body="body" name="To" type="string" required>
+  Called phone number (automatically provided by Twilio)
+</ParamField>
+
+<ParamField body="body" name="ForwardedFrom" type="string" optional>
+  Forwarded from phone number if the call was forwarded (automatically provided by Twilio)
+</ParamField>
+
+<ParamField body="body" name="agent_id" type="string">
+  ID of the AI agent to handle the call. Can be provided in query string, request body, or determined from ForwardedFrom phone number.
+</ParamField>
+
+<ParamField body="body" name="external_call_id" type="string" optional>
+  Optional external call ID for tracking purposes.
+</ParamField>
+
+## Example Request
+
+<CodeGroup>
+
+```bash With agent_id in query
+curl -X POST "https://api.call24x7.ai/inbound_call?agent_id=agent-123" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "CallSid=CA1234567890abcdef&From=%2B1234567890&To=%2B0987654321"
+```
+
+```bash With agent_id in body
+curl -X POST https://api.call24x7.ai/inbound_call \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "CallSid=CA1234567890abcdef&From=%2B1234567890&To=%2B0987654321&agent_id=agent-123"
+```
+
+</CodeGroup>
+
+## Response
+
+On success, this endpoint returns TwiML XML that instructs Twilio to stream the call audio to the Call24x7.AI WebSocket server.
+
+### Success Response (TwiML XML)
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Connect>
+    <Stream url="wss://ws.call24x7.ai/{call_id}" />
+  </Connect>
+</Response>
+```
+
+### Error Response (JSON)
+
+<ResponseField name="success" type="boolean">
+  Always `false` for errors
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Human-readable error message
+</ResponseField>
+
+<ResponseField name="error_code" type="string">
+  Error code. Possible values: `MISSING_PARAMS`, `AGENT_NOT_FOUND`, `INSUFFICIENT_BALANCE`, `INTERNAL_ERROR`
+</ResponseField>
+
+## Example Error Response
+
+```json
+{
+  "success": false,
+  "message": "Missing agent_id in query string, request body, or unable to find agent from ForwardedFrom phone number",
+  "error_code": "MISSING_PARAMS"
+}
+```
+
+## Agent ID Resolution
+
+The `agent_id` can be provided in three ways (checked in order):
+
+1. **Query parameter**: `?agent_id=agent-123`
+2. **Request body**: `agent_id=agent-123` in the form data
+3. **ForwardedFrom lookup**: If `ForwardedFrom` is provided, the system attempts to find the user by phone number and use their active inbound agent
+
+## Twilio Configuration
+
+To use this endpoint, configure your Twilio phone number's webhook URL to point to:
+
+```
+https://api.call24x7.ai/inbound_call?agent_id=YOUR_AGENT_ID
+```
+
+Or configure it without the agent_id and provide it in the request body or use the ForwardedFrom lookup feature.
+
+## Notes
+
+- This endpoint is designed to be called by Twilio webhooks, not directly by your application
+- The endpoint returns TwiML XML on success, not JSON
+- Ensure your account has sufficient balance before receiving calls
+- Calls are billed at $0.15 per minute with precise second-by-second billing

@@ -1,4 +1,146 @@
 ---
-title: 'Create Plant'
-openapi: 'POST /plants'
+title: 'Make Outbound Call'
+openapi: 'POST /outbound_call'
 ---
+
+## Overview
+
+Initiate a new outbound phone call using an AI agent. The agent will automatically handle the conversation based on its configuration.
+
+## Request Body
+
+<ParamField body="body" name="to_phone_number" type="string" required>
+  Phone number to call in E.164 format (e.g., +1234567890)
+</ParamField>
+
+<ParamField body="body" name="agent_id" type="string">
+  ID of the AI agent to use for the call. Required if `instruction` is not provided.
+</ParamField>
+
+<ParamField body="body" name="instruction" type="string">
+  AI agent instruction/prompt. Used to create a temporary agent if `agent_id` is not provided. Required if `agent_id` is not provided.
+</ParamField>
+
+<ParamField body="body" name="webhook_url" type="string" optional>
+  Optional webhook URL to receive call completion notifications. Must be a valid HTTP/HTTPS URL.
+</ParamField>
+
+<ParamField body="body" name="external_call_id" type="string" optional>
+  Optional external call ID for tracking purposes.
+</ParamField>
+
+<ParamField body="body" name="input_parameters" type="string" optional>
+  Optional input parameters as JSON string to pass to the agent.
+</ParamField>
+
+<ParamField body="body" name="output_parameters" type="string" optional>
+  Optional output parameters template as JSON string to extract structured data from the conversation.
+</ParamField>
+
+<ParamField body="body" name="call_id" type="string" optional>
+  Existing call ID to retrieve status for. If provided, a new call will not be created.
+</ParamField>
+
+## Example Request
+
+<CodeGroup>
+
+```bash Basic call
+curl -X POST https://api.call24x7.ai/outbound_call \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "to_phone_number": "+1234567890",
+    "agent_id": "agent-123"
+  }'
+```
+
+```bash Call with webhook
+curl -X POST https://api.call24x7.ai/outbound_call \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "to_phone_number": "+1234567890",
+    "agent_id": "agent-123",
+    "webhook_url": "https://your-app.com/webhooks/call-complete",
+    "external_call_id": "order-12345"
+  }'
+```
+
+```bash Call with temporary agent
+curl -X POST https://api.call24x7.ai/outbound_call \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "to_phone_number": "+1234567890",
+    "instruction": "You are a friendly customer service representative calling to confirm an appointment."
+  }'
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Whether the request was successful
+</ResponseField>
+
+<ResponseField name="call_id" type="string">
+  Unique identifier for the call
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current status of the call. Initially `RINGING` when call is initiated.
+</ResponseField>
+
+<ResponseField name="message" type="string" optional>
+  Response message
+</ResponseField>
+
+## Example Response
+
+```json
+{
+  "success": true,
+  "call_id": "12345",
+  "status": "RINGING",
+  "message": "Call initiated successfully"
+}
+```
+
+## Error Responses
+
+<ResponseField name="success" type="boolean">
+  Always `false` for errors
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Human-readable error message
+</ResponseField>
+
+<ResponseField name="error_code" type="string">
+  Error code. Possible values: `MISSING_PARAMS`, `AGENT_NOT_FOUND`, `INSUFFICIENT_BALANCE`, `INTERNAL_ERROR`
+</ResponseField>
+
+## Webhooks
+
+If you provide a `webhook_url`, you'll receive a POST request when the call completes with the following data:
+
+```json
+{
+  "call_id": "12345",
+  "status": "COMPLETED",
+  "call_direction": "outbound",
+  "from_phone_number": "+1234567890",
+  "to_phone_number": "+0987654321",
+  "agent_id": "agent-123",
+  "duration_seconds": 180,
+  "recording_url": "https://...",
+  "transcription": "Full call transcription...",
+  "output_parameters": "{\"appointment_scheduled\": true}"
+}
+```
+
+## Billing
+
+Calls are billed at $0.15 per minute with precise second-by-second billing. Ensure your account has sufficient balance before making calls.

@@ -1,4 +1,89 @@
 ---
-title: 'Get Plants'
-openapi: 'GET /plants'
+title: 'Get Call Status'
+openapi: 'GET /outbound_call'
 ---
+
+## Overview
+
+Retrieve the status of an existing call by providing the `call_id`, or initiate a new outbound call using query parameters.
+
+## Parameters
+
+<ParamField body="query" name="call_id" type="string" optional>
+  Existing call ID to retrieve status for. If provided, other parameters are ignored.
+</ParamField>
+
+<ParamField body="query" name="to_phone_number" type="string" required>
+  Phone number to call in E.164 format (e.g., +1234567890). Required if `call_id` is not provided.
+</ParamField>
+
+<ParamField body="query" name="agent_id" type="string" required>
+  ID of the AI agent to use for the call. Required if `call_id` is not provided.
+</ParamField>
+
+<ParamField body="query" name="webhook_url" type="string" optional>
+  Optional webhook URL to receive call completion notifications. Must be a valid HTTP/HTTPS URL.
+</ParamField>
+
+<ParamField body="query" name="external_call_id" type="string" optional>
+  Optional external call ID for tracking purposes.
+</ParamField>
+
+## Example Request
+
+<CodeGroup>
+
+```bash
+curl -X GET "https://api.call24x7.ai/outbound_call?to_phone_number=%2B1234567890&agent_id=agent-123" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```bash Get existing call status
+curl -X GET "https://api.call24x7.ai/outbound_call?call_id=12345" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Whether the request was successful
+</ResponseField>
+
+<ResponseField name="call_id" type="string">
+  Unique identifier for the call
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current status of the call. Possible values: `IDLE`, `RINGING`, `IN_PROGRESS`, `COMPLETED`, `FAILED`
+</ResponseField>
+
+<ResponseField name="message" type="string" optional>
+  Response message
+</ResponseField>
+
+## Example Response
+
+```json
+{
+  "success": true,
+  "call_id": "12345",
+  "status": "RINGING",
+  "message": "Call initiated successfully"
+}
+```
+
+## Error Responses
+
+<ResponseField name="success" type="boolean">
+  Always `false` for errors
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Human-readable error message
+</ResponseField>
+
+<ResponseField name="error_code" type="string">
+  Error code. Possible values: `MISSING_PARAMS`, `AGENT_NOT_FOUND`, `CALL_NOT_FOUND`, `INSUFFICIENT_BALANCE`, `INTERNAL_ERROR`
+</ResponseField>

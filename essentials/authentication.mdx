@@ -1,0 +1,192 @@
+---
+title: 'Authentication'
+description: 'API key setup and authentication for Call24x7.AI'
+icon: 'key'
+---
+
+## Overview
+
+All Call24x7.AI API requests require authentication using an API key. This guide explains how to obtain, use, and secure your API keys.
+
+## Getting Your API Key
+
+1. Sign in to the [Call24x7.AI Developer Portal](https://call24x7.ai/developer)
+2. Navigate to the **API Keys** section
+3. Click **Create New API Key**
+4. Give your key a descriptive name (e.g., "Production API Key" or "Development Key")
+5. Copy the key immediately - it won't be shown again
+
+<Warning>
+  API keys are sensitive credentials. Store them securely and never expose them in client-side code, public repositories, or logs.
+</Warning>
+
+## Using Your API Key
+
+Include your API key in the `Authorization` header of all API requests as a Bearer token:
+
+```bash
+Authorization: Bearer YOUR_API_KEY
+```
+
+### Example Request
+
+```bash
+curl -X POST https://api.call24x7.ai/outbound_call \
+  -H "Authorization: Bearer sk_live_1234567890abcdef" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "to_phone_number": "+1234567890",
+    "agent_id": "agent-123"
+  }'
+```
+
+## API Key Format
+
+Call24x7.AI API keys follow this format:
+
+- **Production keys**: Start with `sk_live_`
+- **Test keys**: Start with `sk_test_`
+
+## Best Practices
+
+### Environment Variables
+
+Store your API key in environment variables rather than hardcoding:
+
+<CodeGroup>
+
+```bash .env
+CALL24X7_API_KEY=sk_live_1234567890abcdef
+```
+
+```javascript Node.js
+const apiKey = process.env.CALL24X7_API_KEY;
+
+fetch('https://api.call24x7.ai/outbound_call', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${apiKey}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    to_phone_number: '+1234567890',
+    agent_id: 'agent-123'
+  })
+});
+```
+
+```python Python
+import os
+import requests
+
+api_key = os.getenv('CALL24X7_API_KEY')
+
+response = requests.post(
+    'https://api.call24x7.ai/outbound_call',
+    headers={
+        'Authorization': f'Bearer {api_key}',
+        'Content-Type': 'application/json'
+    },
+    json={
+        'to_phone_number': '+1234567890',
+        'agent_id': 'agent-123'
+    }
+)
+```
+
+</CodeGroup>
+
+### Key Rotation
+
+Regularly rotate your API keys for security:
+
+1. Create a new API key
+2. Update your applications to use the new key
+3. Test that everything works
+4. Revoke the old key
+
+### Multiple Keys
+
+Create separate API keys for different environments or purposes:
+
+- **Development**: For testing and development
+- **Staging**: For staging environment
+- **Production**: For live production use
+- **Service-specific**: One key per service or application
+
+## Error Responses
+
+### Invalid API Key
+
+If your API key is invalid or missing, you'll receive a `401 Unauthorized` response:
+
+```json
+{
+  "success": false,
+  "message": "Unauthorized",
+  "error_code": "UNAUTHORIZED"
+}
+```
+
+### Expired or Revoked Key
+
+If your API key has been revoked or expired:
+
+```json
+{
+  "success": false,
+  "message": "API key has been revoked",
+  "error_code": "UNAUTHORIZED"
+}
+```
+
+## Security Checklist
+
+- [ ] Store API keys in environment variables
+- [ ] Never commit keys to version control
+- [ ] Use different keys for different environments
+- [ ] Rotate keys regularly
+- [ ] Revoke unused or compromised keys immediately
+- [ ] Use HTTPS for all API requests
+- [ ] Monitor API usage for suspicious activity
+
+## Rate Limits
+
+API requests are subject to rate limiting based on your plan. If you exceed the rate limit, you'll receive a `429 Too Many Requests` response.
+
+<Info>
+  Rate limits are applied per API key. Contact support if you need higher limits.
+</Info>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Getting 401 Unauthorized errors">
+    - Verify your API key is correct
+    - Check that you're including the `Bearer` prefix
+    - Ensure the key hasn't been revoked
+    - Make sure you're using the correct key for your environment
+  </Accordion>
+  <Accordion title="API key not working">
+    - Check that the key is copied correctly (no extra spaces)
+    - Verify the key hasn't expired
+    - Ensure you're using the correct base URL (`https://api.call24x7.ai`)
+    - Try creating a new key
+  </Accordion>
+  <Accordion title="Key exposed in logs">
+    If you've accidentally exposed your API key:
+    1. Revoke the exposed key immediately
+    2. Create a new API key
+    3. Update all applications using the old key
+    4. Review your logs and remove any instances of the exposed key
+  </Accordion>
+</AccordionGroup>
+
+## Support
+
+If you're having authentication issues:
+
+- Check the [API Reference](/api-reference) for detailed endpoint documentation
+- Visit our [Help Center](https://call24x7.ai/help)
+- Contact support: support@call24x7.ai
+

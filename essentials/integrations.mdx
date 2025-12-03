@@ -1,0 +1,287 @@
+---
+title: 'Integrations'
+description: 'Integrate Call24x7.AI with your existing tools and workflows'
+icon: 'plug'
+---
+
+## Overview
+
+Call24x7.AI can be integrated with a wide variety of tools and platforms to automate workflows and sync data. This guide covers common integration patterns and examples.
+
+## Integration Methods
+
+### REST API
+
+The primary integration method is through our REST API:
+
+- **Direct API calls**: Make HTTP requests to Call24x7.AI endpoints
+- **SDKs**: Use language-specific SDKs (when available)
+- **Webhooks**: Receive call completion notifications
+
+### No-Code Platforms
+
+Integrate without writing code:
+
+- **Zapier**: Connect Call24x7.AI with 5000+ apps
+- **Make.com**: Build complex automation workflows
+- See the [No-Code Integration Guide](/no-code) for details
+
+## Common Integrations
+
+### CRM Integration
+
+Sync call data with your CRM:
+
+<CodeGroup>
+
+```javascript Example: Salesforce
+// After call completes via webhook
+app.post('/webhooks/call-complete', async (req, res) => {
+  const { to_phone_number, output_parameters } = req.body;
+  const data = JSON.parse(output_parameters || '{}');
+  
+  // Update Salesforce contact
+  await salesforce.updateContact(to_phone_number, {
+    LastCallDate: new Date(),
+    AppointmentScheduled: data.appointment_scheduled,
+    CallNotes: data.notes
+  });
+  
+  res.status(200).json({ received: true });
+});
+```
+
+```python Example: HubSpot
+# After call completes via webhook
+@app.route('/webhooks/call-complete', methods=['POST'])
+def handle_webhook():
+    call_data = request.json
+    phone = call_data['to_phone_number']
+    output = json.loads(call_data.get('output_parameters', '{}'))
+    
+    # Update HubSpot contact
+    hubspot.contacts.update(phone, {
+        'last_call_date': call_data['end_time'],
+        'appointment_scheduled': output.get('appointment_scheduled'),
+        'call_transcription': call_data.get('transcription')
+    })
+    
+    return jsonify({'received': True}), 200
+```
+
+</CodeGroup>
+
+### E-commerce Integration
+
+Trigger calls based on order events:
+
+```javascript
+// When new order is placed
+app.post('/webhooks/new-order', async (req, res) => {
+  const { customer_phone, order_id } = req.body;
+  
+  // Make confirmation call
+  await fetch('https://api.call24x7.ai/outbound_call', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.CALL24X7_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      to_phone_number: customer_phone,
+      agent_id: 'order-confirmation-agent',
+      input_parameters: JSON.stringify({ order_id }),
+      webhook_url: 'https://your-app.com/webhooks/call-complete'
+    })
+  });
+  
+  res.status(200).json({ success: true });
+});
+```
+
+### Support Ticket Integration
+
+Handle support tickets with phone calls:
+
+```javascript
+// When high-priority ticket is created
+app.post('/webhooks/new-ticket', async (req, res) => {
+  const { ticket_id, customer_phone, priority } = req.body;
+  
+  if (priority === 'high') {
+    // Call customer immediately
+    await call24x7.makeCall({
+      to_phone_number: customer_phone,
+      agent_id: 'support-agent',
+      input_parameters: JSON.stringify({ ticket_id }),
+      webhook_url: 'https://your-app.com/webhooks/call-complete'
+    });
+  }
+  
+  res.status(200).json({ received: true });
+});
+```
+
+### Calendar Integration
+
+Schedule and confirm appointments:
+
+```javascript
+// Sync appointments with calendar
+app.post('/webhooks/appointment-created', async (req, res) => {
+  const { appointment_date, customer_phone, customer_name } = req.body;
+  
+  // Make reminder call
+  await call24x7.makeCall({
+    to_phone_number: customer_phone,
+    agent_id: 'appointment-reminder-agent',
+    input_parameters: JSON.stringify({
+      appointment_date,
+      customer_name
+    })
+  });
+  
+  res.status(200).json({ success: true });
+});
+```
+
+## Integration Patterns
+
+### Event-Driven Integration
+
+Trigger calls based on events:
+
+1. **Event occurs** (e.g., new order, ticket created)
+2. **Webhook received** by your application
+3. **Call initiated** via Call24x7.AI API
+4. **Call completes** and webhook sent
+5. **Data synced** with your systems
+
+### Scheduled Integration
+
+Make calls on a schedule:
+
+```javascript
+// Cron job to make daily reminder calls
+cron.schedule('0 9 * * *', async () => {
+  const appointments = await getTodayAppointments();
+  
+  for (const appointment of appointments) {
+    await call24x7.makeCall({
+      to_phone_number: appointment.phone,
+      agent_id: 'reminder-agent',
+      input_parameters: JSON.stringify({
+        appointment_time: appointment.time
+      })
+    });
+  }
+});
+```
+
+### Two-Way Sync
+
+Sync data in both directions:
+
+1. **Your system → Call24x7.AI**: Send customer data when making calls
+2. **Call24x7.AI → Your system**: Receive call results via webhooks
+
+## Webhook Integration
+
+Use webhooks to integrate call results:
+
+```javascript
+app.post('/webhooks/call-complete', async (req, res) => {
+  const callData = req.body;
+  
+  // Update multiple systems
+  await Promise.all([
+    updateCRM(callData),
+    updateAnalytics(callData),
+    sendNotification(callData),
+    logCall(callData)
+  ]);
+  
+  res.status(200).json({ received: true });
+});
+```
+
+## Authentication in Integrations
+
+### API Key Management
+
+Store API keys securely:
+
+<CodeGroup>
+
+```bash Environment Variables
+export CALL24X7_API_KEY=sk_live_...
+```
+
+```javascript Node.js
+const apiKey = process.env.CALL24X7_API_KEY;
+```
+
+```python Python
+import os
+api_key = os.getenv('CALL24X7_API_KEY')
+```
+
+</CodeGroup>
+
+### OAuth Integration
+
+For third-party integrations, use OAuth when available.
+
+## Error Handling
+
+Implement robust error handling:
+
+```javascript
+async function makeCallWithRetry(params, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const response = await call24x7.makeCall(params);
+      return response;
+    } catch (error) {
+      if (i === maxRetries - 1) throw error;
+      await sleep(1000 * (i + 1)); // Exponential backoff
+    }
+  }
+}
+```
+
+## Best Practices
+
+1. **Idempotency**: Handle duplicate events gracefully
+2. **Error Handling**: Implement retry logic and error recovery
+3. **Rate Limiting**: Respect API rate limits
+4. **Logging**: Log all integration activities
+5. **Testing**: Test integrations thoroughly before production
+6. **Monitoring**: Monitor integration health and performance
+
+## Integration Examples
+
+<CardGroup cols={2}>
+  <Card title="Zapier" icon="zap" href="/no-code">
+    Connect with 5000+ apps via Zapier
+  </Card>
+  <Card title="Make.com" icon="puzzle" href="/no-code">
+    Build complex automation workflows
+  </Card>
+  <Card title="Salesforce" icon="cloud">
+    Sync call data with Salesforce CRM
+  </Card>
+  <Card title="HubSpot" icon="database">
+    Integrate with HubSpot for marketing automation
+  </Card>
+</CardGroup>
+
+## Support
+
+For integration help:
+
+- Check the [API Reference](/api-reference)
+- Review the [No-Code Integration Guide](/no-code)
+- Visit our [Help Center](https://call24x7.ai/help)
+- Contact support: support@call24x7.ai
+

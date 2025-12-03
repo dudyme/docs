@@ -1,16 +1,19 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
-    "version": "1.0.0"
+    "title": "Call24x7.AI API",
+    "description": "API for making AI-powered phone calls. Initiate outbound calls, handle inbound calls, and manage your AI agents programmatically.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Call24x7.AI Support",
+      "email": "support@call24x7.ai",
+      "url": "https://call24x7.ai/help"
+    }
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://api.call24x7.ai",
+      "description": "Production server"
     }
   ],
   "security": [
@@ -19,36 +22,104 @@
     }
   ],
   "paths": {
-    "/plants": {
+    "/outbound_call": {
       "get": {
-        "description": "Returns all plants from the system that the user has access to",
+        "summary": "Get call status or initiate outbound call",
+        "description": "Retrieve the status of an existing call by call_id, or initiate a new outbound call using query parameters.",
+        "operationId": "getOutboundCall",
+        "tags": ["Calls"],
         "parameters": [
           {
-            "name": "limit",
+            "name": "call_id",
             "in": "query",
-            "description": "The maximum number of results to return",
+            "description": "Existing call ID to retrieve status for",
+            "required": false,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
+            }
+          },
+          {
+            "name": "to_phone_number",
+            "in": "query",
+            "description": "Phone number to call (E.164 format, e.g., +1234567890). Required if call_id is not provided.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\+[1-9]\\d{1,14}$"
+            }
+          },
+          {
+            "name": "agent_id",
+            "in": "query",
+            "description": "ID of the AI agent to use for the call. Required if call_id is not provided.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "webhook_url",
+            "in": "query",
+            "description": "Optional webhook URL to receive call completion notifications",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          {
+            "name": "external_call_id",
+            "in": "query",
+            "description": "Optional external call ID for tracking",
+            "required": false,
+            "schema": {
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Call initiated successfully or call status retrieved",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
-                  }
+                  "$ref": "#/components/schemas/CallResponse"
                 }
               }
             }
           },
           "400": {
-            "description": "Unexpected error",
+            "description": "Bad request - missing or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Insufficient balance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Call or agent not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
             "content": {
               "application/json": {
                 "schema": {
@@ -60,31 +131,64 @@
         }
       },
       "post": {
-        "description": "Creates a new plant in the store",
+        "summary": "Initiate outbound call",
+        "description": "Initiate a new outbound phone call using an AI agent. The agent will handle the conversation automatically.",
+        "operationId": "createOutboundCall",
+        "tags": ["Calls"],
         "requestBody": {
-          "description": "Plant to add to the store",
+          "description": "Call request parameters",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "$ref": "#/components/schemas/OutboundCallRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
-            "description": "plant response",
+            "description": "Call initiated successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/CallResponse"
                 }
               }
             }
           },
           "400": {
-            "description": "unexpected error",
+            "description": "Bad request - missing or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Insufficient balance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Agent not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
             "content": {
               "application/json": {
                 "schema": {
@@ -96,28 +200,78 @@
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+    "/inbound_call": {
+      "post": {
+        "summary": "Handle inbound call",
+        "description": "Process an incoming call from Twilio. This endpoint is typically called by Twilio webhooks when a call is received.",
+        "operationId": "handleInboundCall",
+        "tags": ["Calls"],
+        "requestBody": {
+          "description": "Twilio webhook parameters",
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/InboundCallRequest"
+              }
+            }
+          }
+        },
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
+            "name": "agent_id",
+            "in": "query",
+            "description": "ID of the AI agent to handle the inbound call",
+            "required": false,
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string"
             }
           }
         ],
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
+          "200": {
+            "description": "TwiML response for Twilio",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "type": "string",
+                  "description": "TwiML XML response"
+                }
+              }
+            }
           },
           "400": {
-            "description": "unexpected error",
+            "description": "Bad request - missing or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Insufficient balance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Agent not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
             "content": {
               "application/json": {
                 "schema": {
@@ -132,55 +286,123 @@
   },
   "components": {
     "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
+      "OutboundCallRequest": {
         "type": "object",
+        "required": ["to_phone_number"],
         "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
+          "call_id": {
+            "type": "string",
+            "description": "Existing call ID to retrieve status for"
           },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
+          "to_phone_number": {
+            "type": "string",
+            "description": "Phone number to call (E.164 format, e.g., +1234567890)",
+            "pattern": "^\\+[1-9]\\d{1,14}$"
+          },
+          "agent_id": {
+            "type": "string",
+            "description": "ID of the AI agent to use for the call. Required if instruction is not provided."
+          },
+          "instruction": {
+            "type": "string",
+            "description": "AI agent instruction/prompt. Used to create a temporary agent if agent_id is not provided."
+          },
+          "webhook_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Optional webhook URL to receive call completion notifications"
+          },
+          "external_call_id": {
+            "type": "string",
+            "description": "Optional external call ID for tracking"
+          },
+          "input_parameters": {
+            "type": "string",
+            "description": "Optional input parameters as JSON string"
+          },
+          "output_parameters": {
+            "type": "string",
+            "description": "Optional output parameters template as JSON string"
           }
         }
       },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
+      "InboundCallRequest": {
         "type": "object",
+        "description": "Twilio webhook parameters for inbound calls",
         "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
+          "CallSid": {
+            "type": "string",
+            "description": "Twilio call SID"
+          },
+          "From": {
+            "type": "string",
+            "description": "Caller's phone number"
+          },
+          "To": {
+            "type": "string",
+            "description": "Called phone number"
+          },
+          "ForwardedFrom": {
+            "type": "string",
+            "description": "Forwarded from phone number (if call was forwarded)"
+          },
+          "agent_id": {
+            "type": "string",
+            "description": "ID of the AI agent to handle the call"
+          },
+          "external_call_id": {
+            "type": "string",
+            "description": "Optional external call ID for tracking"
+          }
+        }
+      },
+      "CallResponse": {
+        "type": "object",
+        "required": ["success", "call_id", "status"],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the request was successful"
+          },
+          "call_id": {
+            "type": "string",
+            "description": "Unique identifier for the call"
+          },
+          "status": {
+            "type": "string",
+            "description": "Current status of the call",
+            "enum": ["IDLE", "RINGING", "IN_PROGRESS", "COMPLETED", "FAILED"]
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "description": "Response message"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["success", "message", "error_code"],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Always false for errors",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message"
+          },
+          "error_code": {
+            "type": "string",
+            "description": "Machine-readable error code",
+            "enum": [
+              "MISSING_PARAMS",
+              "UNAUTHORIZED",
+              "INSUFFICIENT_BALANCE",
+              "AGENT_NOT_FOUND",
+              "CALL_NOT_FOUND",
+              "INTERNAL_ERROR"
+            ]
           }
         }
       }
@@ -188,7 +410,9 @@
     "securitySchemes": {
       "bearerAuth": {
         "type": "http",
-        "scheme": "bearer"
+        "scheme": "bearer",
+        "bearerFormat": "API Key",
+        "description": "API key authentication. Include your API key in the Authorization header as: Bearer YOUR_API_KEY"
       }
     }
   }

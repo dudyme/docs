@@ -1,0 +1,139 @@
+---
+title: 'Getting Started'
+description: 'Quick start guide for Call24x7.AI developers'
+icon: 'rocket'
+---
+
+## Overview
+
+This guide will help you get started with Call24x7.AI quickly. You'll learn how to set up your account, create your first AI agent, and make your first call.
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- A Call24x7.AI developer account
+- An API key from the [Developer Portal](https://call24x7.ai/developer)
+- A phone number to test with (your own number is recommended for testing)
+
+## Step 1: Create Your Account
+
+1. Visit the [Call24x7.AI Developer Portal](https://call24x7.ai/developer)
+2. Sign up for a new account
+3. Verify your email address
+4. Complete your profile setup
+
+## Step 2: Get Your API Key
+
+1. Navigate to the **API Keys** section in your dashboard
+2. Click **Create New API Key**
+3. Copy and securely store your API key
+
+<Warning>
+  Your API key is sensitive. Never share it publicly or commit it to version control. Use environment variables or secure secret management.
+</Warning>
+
+## Step 3: Create Your First Agent
+
+An AI agent is the "personality" that handles your phone calls. You can create agents through:
+
+- **Developer Portal**: Use the web interface to create and configure agents
+- **API**: Create agents programmatically using the API
+
+### Using the Developer Portal
+
+1. Go to the **Agents** section
+2. Click **Create New Agent**
+3. Configure your agent:
+   - **Name**: Give your agent a descriptive name
+   - **Instruction**: Write the prompt that defines how your agent behaves
+   - **Voice**: Select a voice model
+   - **Language**: Choose the language for conversations
+
+### Agent Instructions
+
+The instruction/prompt is crucial - it defines how your agent will behave during calls. Example:
+
+```
+You are a friendly customer service representative for ABC Company. 
+Your role is to:
+- Greet customers warmly
+- Answer questions about our products
+- Schedule appointments when requested
+- Be professional and helpful at all times
+```
+
+## Step 4: Make Your First Call
+
+### Using the Developer Portal
+
+1. Navigate to the **Send Call** page
+2. Enter the recipient's phone number
+3. Select your agent
+4. Click **Send Call**
+
+### Using the API
+
+```bash
+curl -X POST https://api.call24x7.ai/outbound_call \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "to_phone_number": "+1234567890",
+    "agent_id": "your-agent-id"
+  }'
+```
+
+## Step 5: Monitor Your Calls
+
+After initiating a call, you can:
+
+- **View call status**: Check the status in your dashboard
+- **Listen to recordings**: Access call recordings after completion
+- **Review transcriptions**: Read full conversation transcripts
+- **Set up webhooks**: Receive real-time notifications when calls complete
+
+## Next Steps
+
+Now that you've made your first call, explore these resources:
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/essentials/authentication">
+    Learn about API authentication and security
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/essentials/webhooks">
+    Set up webhooks for call notifications
+  </Card>
+  <Card title="Agents" icon="robot" href="/essentials/agents">
+    Deep dive into creating and managing agents
+  </Card>
+  <Card title="API Reference" icon="book" href="/api-reference">
+    Explore the complete API documentation
+  </Card>
+</CardGroup>
+
+## Common Questions
+
+<AccordionGroup>
+  <Accordion title="How much do calls cost?">
+    Calls are billed at $0.15 per minute with precise second-by-second billing. You only pay for the actual call duration.
+  </Accordion>
+  <Accordion title="What phone number formats are supported?">
+    Phone numbers must be in E.164 format (e.g., +1234567890). Include the country code and the + prefix.
+  </Accordion>
+  <Accordion title="Can I test calls before going live?">
+    Yes! We recommend testing with your own phone number first. You can also use the testing suite in the Developer Portal.
+  </Accordion>
+  <Accordion title="How do I handle errors?">
+    All API responses include error codes. Check the [API Reference](/api-reference) for a complete list of error codes and their meanings.
+  </Accordion>
+</AccordionGroup>
+
+## Support
+
+Need help? We're here for you:
+
+- [Help Center](https://call24x7.ai/help)
+- Email: support@call24x7.ai
+- [API Reference](/api-reference)
+

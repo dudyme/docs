@@ -1,0 +1,299 @@
+---
+title: 'Webhooks'
+description: 'Configure webhooks to receive call completion notifications'
+icon: 'webhook'
+---
+
+## Overview
+
+Webhooks allow you to receive real-time notifications when calls complete. This enables you to integrate Call24x7.AI with your existing systems and workflows.
+
+## How Webhooks Work
+
+1. You provide a `webhook_url` when making a call
+2. Call24x7.AI processes the call
+3. When the call completes, Call24x7.AI sends a POST request to your webhook URL
+4. Your server processes the webhook data
+
+## Setting Up Webhooks
+
+### Step 1: Create a Webhook Endpoint
+
+Create an HTTP endpoint in your application that can receive POST requests:
+
+<CodeGroup>
+
+```javascript Node.js/Express
+app.post('/webhooks/call-complete', (req, res) => {
+  const callData = req.body;
+  
+  // Process the call data
+  console.log('Call completed:', callData.call_id);
+  console.log('Status:', callData.status);
+  console.log('Duration:', callData.duration_seconds);
+  
+  // Acknowledge receipt
+  res.status(200).json({ received: true });
+});
+```
+
+```python Python/Flask
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route('/webhooks/call-complete', methods=['POST'])
+def handle_webhook():
+    call_data = request.json
+    
+    # Process the call data
+    print(f"Call completed: {call_data['call_id']}")
+    print(f"Status: {call_data['status']}")
+    print(f"Duration: {call_data['duration_seconds']}")
+    
+    # Acknowledge receipt
+    return jsonify({'received': True}), 200
+```
+
+</CodeGroup>
+
+### Step 2: Make Your Endpoint Publicly Accessible
+
+Your webhook endpoint must be publicly accessible via HTTPS. For local development, use a tunneling service:
+
+- **ngrok**: `ngrok http 3000`
+- **localtunnel**: `lt --port 3000`
+- **Cloudflare Tunnel**: For production deployments
+
+### Step 3: Include Webhook URL in Call Requests
+
+Add the `webhook_url` parameter when making calls:
+
+```bash
+curl -X POST https://api.call24x7.ai/outbound_call \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "to_phone_number": "+1234567890",
+    "agent_id": "agent-123",
+    "webhook_url": "https://your-app.com/webhooks/call-complete"
+  }'
+```
+
+## Webhook Payload
+
+When a call completes, your webhook endpoint will receive a POST request with the following JSON payload:
+
+```json
+{
+  "call_id": "12345",
+  "status": "COMPLETED",
+  "call_direction": "outbound",
+  "from_phone_number": "+1234567890",
+  "to_phone_number": "+0987654321",
+  "agent_id": "agent-123",
+  "agent_name": "Customer Service Agent",
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": "2024-01-15T10:33:00Z",
+  "start_time": "2024-01-15T10:30:05Z",
+  "end_time": "2024-01-15T10:33:00Z",
+  "duration_seconds": 175,
+  "recording_url": "https://recordings.call24x7.ai/calls/12345.mp3",
+  "summary": "Customer confirmed appointment for next week",
+  "transcription": "Full conversation transcription...",
+  "input_parameters": "{\"customer_id\": \"123\"}",
+  "output_parameters": "{\"appointment_scheduled\": true, \"appointment_date\": \"2024-01-22\"}",
+  "external_call_id": "order-12345",
+  "cost": 0.44
+}
+```
+
+### Payload Fields
+
+<ResponseField name="call_id" type="string">
+  Unique identifier for the call
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Final call status: `COMPLETED`, `FAILED`, or `CANCELLED`
+</ResponseField>
+
+<ResponseField name="call_direction" type="string">
+  Direction of the call: `outbound` or `inbound`
+</ResponseField>
+
+<ResponseField name="from_phone_number" type="string">
+  Phone number that initiated the call
+</ResponseField>
+
+<ResponseField name="to_phone_number" type="string">
+  Phone number that received the call
+</ResponseField>
+
+<ResponseField name="agent_id" type="string">
+  ID of the AI agent that handled the call
+</ResponseField>
+
+<ResponseField name="agent_name" type="string" optional>
+  Name of the AI agent
+</ResponseField>
+
+<ResponseField name="duration_seconds" type="number" optional>
+  Call duration in seconds
+</ResponseField>
+
+<ResponseField name="recording_url" type="string" optional>
+  URL to access the call recording
+</ResponseField>
+
+<ResponseField name="transcription" type="string" optional>
+  Full conversation transcription
+</ResponseField>
+
+<ResponseField name="output_parameters" type="string" optional>
+  Structured data extracted from the conversation (JSON string)
+</ResponseField>
+
+<ResponseField name="cost" type="number" optional>
+  Cost of the call in USD
+</ResponseField>
+
+## Webhook Security
+
+### Verify Webhook Requests
+
+While Call24x7.AI doesn't currently sign webhooks, you should:
+
+1. **Use HTTPS**: Always use HTTPS for webhook endpoints
+2. **Validate Source**: Verify requests are coming from Call24x7.AI
+3. **Idempotency**: Handle duplicate webhook deliveries gracefully
+4. **Timeouts**: Respond quickly (within 5 seconds) to avoid retries
+
+### Example: Idempotent Webhook Handler
+
+```javascript
+const processedCalls = new Set();
+
+app.post('/webhooks/call-complete', async (req, res) => {
+  const { call_id } = req.body;
+  
+  // Check if we've already processed this call
+  if (processedCalls.has(call_id)) {
+    return res.status(200).json({ received: true, duplicate: true });
+  }
+  
+  // Process the webhook
+  await processCallCompletion(req.body);
+  
+  // Mark as processed
+  processedCalls.add(call_id);
+  
+  res.status(200).json({ received: true });
+});
+```
+
+## Webhook Retries
+
+If your webhook endpoint doesn't respond with a `2xx` status code within 5 seconds, Call24x7.AI will retry the webhook:
+
+- **Retry attempts**: Up to 3 retries
+- **Retry intervals**: Exponential backoff (1s, 5s, 30s)
+- **Timeout**: 5 seconds per request
+
+<Warning>
+  Always respond quickly to webhook requests to avoid unnecessary retries.
+</Warning>
+
+## Testing Webhooks
+
+### Using ngrok for Local Testing
+
+1. Start your local server: `node server.js`
+2. Start ngrok: `ngrok http 3000`
+3. Use the ngrok URL as your webhook URL: `https://abc123.ngrok.io/webhooks/call-complete`
+4. Make a test call with the webhook URL
+
+### Using Webhook Testing Tools
+
+- **webhook.site**: Get a temporary webhook URL for testing
+- **RequestBin**: Create a bin to inspect webhook payloads
+- **Postman**: Use Postman's webhook testing features
+
+## Best Practices
+
+1. **Idempotency**: Handle duplicate webhook deliveries
+2. **Fast Response**: Respond within 5 seconds
+3. **Error Handling**: Log errors but return 200 to prevent retries
+4. **Validation**: Validate webhook payload structure
+5. **Monitoring**: Monitor webhook delivery success rates
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Webhooks not being received">
+    - Verify your endpoint is publicly accessible
+    - Check that the URL uses HTTPS
+    - Ensure your server is running and accessible
+    - Check firewall and security group settings
+  </Accordion>
+  <Accordion title="Webhooks timing out">
+    - Respond to webhooks quickly (within 5 seconds)
+    - Process webhook data asynchronously if needed
+    - Return 200 immediately, then process
+  </Accordion>
+  <Accordion title="Duplicate webhooks">
+    - Implement idempotency checks using call_id
+    - Handle duplicate deliveries gracefully
+    - Use a database to track processed webhooks
+  </Accordion>
+</AccordionGroup>
+
+## Examples
+
+### Update CRM After Call
+
+```javascript
+app.post('/webhooks/call-complete', async (req, res) => {
+  const { call_id, output_parameters, to_phone_number } = req.body;
+  
+  // Parse output parameters
+  const data = JSON.parse(output_parameters || '{}');
+  
+  // Update CRM
+  if (data.appointment_scheduled) {
+    await crm.updateContact(to_phone_number, {
+      lastCallDate: new Date(),
+      appointmentScheduled: true,
+      appointmentDate: data.appointment_date
+    });
+  }
+  
+  res.status(200).json({ received: true });
+});
+```
+
+### Send Notification
+
+```javascript
+app.post('/webhooks/call-complete', async (req, res) => {
+  const { call_id, status, duration_seconds } = req.body;
+  
+  if (status === 'COMPLETED') {
+    await sendSlackNotification({
+      text: `Call ${call_id} completed successfully`,
+      duration: `${duration_seconds}s`
+    });
+  }
+  
+  res.status(200).json({ received: true });
+});
+```
+
+## Support
+
+For webhook-related issues:
+
+- Check the [API Reference](/api-reference) for webhook configuration
+- Visit our [Help Center](https://call24x7.ai/help)
+- Contact support: support@call24x7.ai
+

@@ -1,33 +1,122 @@
 ---
 title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+description: 'Call24x7.AI API reference documentation'
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+## Welcome to the Call24x7.AI API
 
-## Welcome
+The Call24x7.AI API enables you to make AI-powered phone calls programmatically. Use our REST API to initiate outbound calls, handle inbound calls, and manage your AI agents.
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+## Base URL
 
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+All API requests should be made to:
+
+```
+https://api.call24x7.ai
+```
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+All API endpoints require authentication using an API key. Include your API key in the `Authorization` header as a Bearer token:
+
+```bash
+Authorization: Bearer YOUR_API_KEY
+```
+
+<Info>
+  Get your API key from the [Call24x7.AI Developer Portal](https://call24x7.ai/developer).
+</Info>
+
+### Example Request
+
+```bash
+curl -X POST https://api.call24x7.ai/outbound_call \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "to_phone_number": "+1234567890",
+    "agent_id": "your-agent-id"
+  }'
+```
+
+## API Endpoints
+
+The Call24x7.AI API provides the following main endpoints:
+
+<CardGroup cols={2}>
+  <Card
+    title="Make Outbound Call"
+    icon="phone"
+    href="/api-reference/endpoint/create"
+  >
+    Initiate an outbound phone call using an AI agent (POST)
+  </Card>
+  <Card
+    title="Get Call Status"
+    icon="info-circle"
+    href="/api-reference/endpoint/get"
+  >
+    Retrieve the status of an existing call (GET)
+  </Card>
+  <Card
+    title="Handle Inbound Call"
+    icon="phone-incoming"
+    href="/api-reference/endpoint/delete"
+  >
+    Process incoming calls from Twilio (POST)
+  </Card>
+</CardGroup>
+
+## Response Format
+
+All API responses are returned in JSON format. Successful responses include a `success: true` field, while errors include `success: false` along with an error message and error code.
+
+### Success Response Example
 
 ```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+{
+  "success": true,
+  "call_id": "12345",
+  "status": "RINGING",
+  "message": "Call initiated successfully"
+}
 ```
+
+### Error Response Example
+
+```json
+{
+  "success": false,
+  "message": "Missing required parameter: to_phone_number",
+  "error_code": "MISSING_PARAMS"
+}
+```
+
+## Error Codes
+
+The API uses the following error codes:
+
+| Error Code | Description |
+|------------|-------------|
+| `MISSING_PARAMS` | Required parameters are missing |
+| `UNAUTHORIZED` | Invalid or missing API key |
+| `INSUFFICIENT_BALANCE` | Account has insufficient balance |
+| `AGENT_NOT_FOUND` | The specified agent ID does not exist |
+| `CALL_NOT_FOUND` | The specified call ID does not exist |
+| `INTERNAL_ERROR` | An internal server error occurred |
+
+## Rate Limits
+
+API requests are subject to rate limiting. If you exceed the rate limit, you'll receive a `429 Too Many Requests` response.
+
+## Webhooks
+
+You can configure webhooks to receive notifications when calls complete. Include a `webhook_url` parameter in your call requests to receive call completion events.
+
+<Card
+  title="OpenAPI Specification"
+  icon="file-code"
+  href="https://github.com/call24x7/docs/blob/main/api-reference/openapi.json"
+>
+  View the complete OpenAPI specification
+</Card>

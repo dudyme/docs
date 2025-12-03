@@ -1,14 +1,15 @@
 ---
 title: 'Development'
-description: 'Learn how to preview changes locally'
+description: 'Learn how to develop and preview Call24x7 documentation locally'
 ---
 
 <Info>
-  **Prerequisite** You should have installed Node.js (version 18.10.0 or
-  higher).
+  **Prerequisite** You should have installed Node.js (version 18.10.0 or higher).
 </Info>
 
-Step 1. Install Mintlify on your OS:
+## Local Development Setup
+
+Step 1. Install Mintlify CLI on your OS:
 
 <CodeGroup>
 
@@ -22,29 +23,29 @@ yarn global add mintlify
 
 </CodeGroup>
 
-Step 2. Go to the docs are located (where you can find `mint.json`) and run the following command:
+Step 2. Navigate to the documentation directory (where `mint.json` is located) and run:
 
 ```bash
 mintlify dev
 ```
 
-The documentation website is now available at `http://localhost:3000`.
+The Call24x7 documentation website is now available at `http://localhost:3000`.
 
 ### Custom Ports
 
-Mintlify uses port 3000 by default. You can use the `--port` flag to customize the port Mintlify runs on. For example, use this command to run in port 3333:
+Mintlify uses port 3000 by default. You can use the `--port` flag to customize the port:
 
 ```bash
 mintlify dev --port 3333
 ```
 
-You will see an error like this if you try to run Mintlify in a port that's already taken:
+You will see an error like this if you try to run Mintlify on a port that's already taken:
 
 ```md
 Error: listen EADDRINUSE: address already in use :::3000
 ```
 
-## Mintlify Versions
+## Updating Mintlify CLI
 
 Each CLI is linked to a specific version of Mintlify. Please update the CLI if your local website looks different than production.
 
@@ -63,11 +64,10 @@ yarn global upgrade mintlify
 ## Deployment
 
 <Tip>
-  Unlimited editors available under the [Startup
-  Plan](https://mintlify.com/pricing)
+  Changes are automatically deployed to production when you push to the default branch.
 </Tip>
 
-You should see the following if the deploy successfully went through:
+You should see the following if the deployment successfully went through:
 
 <Frame>
   <img src="/images/checks-passed.png" style={{ borderRadius: '0.5rem' }} />
@@ -75,24 +75,29 @@ You should see the following if the deploy successfully went through:
 
 ## Troubleshooting
 
-Here's how to solve some common problems when working with the CLI.
+Here's how to solve some common problems when working with the Call24x7 documentation.
 
 <AccordionGroup>
   <Accordion title="Mintlify is not loading">
-    Update to Node v18. Run `mintlify install` and try again.
+    Update to Node.js v18 or higher. Run `mintlify install` and try again.
   </Accordion>
   <Accordion title="No such file or directory on Windows">
-Go to the `C:/Users/Username/.mintlify/` directory and remove the `mint`
-folder. Then Open the Git Bash in this location and run `git clone
-https://github.com/mintlify/mint.git`.
-
-Repeat step 3.
-
+    Go to the `C:/Users/Username/.mintlify/` directory and remove the `mint` folder. Then open Git Bash in this location and run `git clone https://github.com/mintlify/mint.git`. Repeat the installation process.
   </Accordion>
   <Accordion title="Getting an unknown error">
-    Try navigating to the root of your device and delete the ~/.mintlify folder.
-    Then run `mintlify dev` again.
+    Try navigating to the root of your device and delete the `~/.mintlify` folder (or `C:/Users/Username/.mintlify` on Windows). Then run `mintlify dev` again.
+  </Accordion>
+  <Accordion title="Documentation looks different locally">
+    Update to the latest Mintlify CLI version: `npm i -g mintlify@latest`
   </Accordion>
 </AccordionGroup>
 
-Curious about what changed in a CLI version? [Check out the CLI changelog.](/changelog/command-line)
+## Contributing
+
+When contributing to the Call24x7 documentation:
+
+1. Make your changes in the appropriate `.mdx` files
+2. Test locally using `mintlify dev`
+3. Ensure all links work correctly
+4. Verify API examples are accurate
+5. Submit a pull request with a clear description of changes

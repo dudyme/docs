@@ -1,124 +1,160 @@
 ---
 title: No Code - Zapier / Make.com
-description: 'Get started with Call24x7.AI - Your AI-driven Phone Calls platform'
+description: 'Integrate Call24x7.AI with Zapier and Make.com for no-code automation'
 ---
 
-<img
-  className="block dark:hidden mx-auto my-4"
-  src="/images/hero-light.svg"
-  alt="Hero Light"
-/>
-<img
-  className="hidden dark:block mx-auto my-4"
-  src="/images/hero-dark.svg"
-  alt="Hero Dark"
-/>
-
-<Alert type="info" title="Quick Start">
-Ready to dive in? Start by signing up for an API key to begin making calls with Call24x7.AI today.
+<Alert type="info" title="No-Code Integration">
+Connect Call24x7.AI with your favorite no-code platforms to automate phone calls without writing any code.
 </Alert>
 
-## What is Call24x7.AI?
+## Overview
 
-Call24x7.AI is an innovative platform designed for AI-powered phone calls. Our platform enables businesses to manage outbound and inbound calls using highly adaptable AI agents. With Call24x7.AI, you can automate and personalize your communication at scale.
+Call24x7.AI can be integrated with Zapier and Make.com (formerly Integromat) to enable powerful automation workflows. These integrations allow you to trigger phone calls, handle call events, and sync data with other tools in your stack.
 
-Our core principles:
-- **Real-Time Speed:** Respond instantly for a natural conversation experience.
-- **High Reliability:** A robust infrastructure ensures uninterrupted service.
-- **Full Customization:** Design every aspect of your AI agent to reflect your brand.
+## Zapier Integration
 
-## How It Works
+### Getting Started
 
-<Tabs>
-<Tab title="Overview">
-Call24x7.AI allows you to create, manage, and deploy AI agents for calls. Use our API to automate calls, handle customer inquiries, and optimize operations with AI-driven interactions.
-</Tab>
-<Tab title="Why Call24x7.AI?">
-Our platform gives you total control. Set up calls with real-time actions, automate responses, and provide customer support with seamless integration.
-</Tab>
-</Tabs>
+1. **Get Your API Key**: Sign up at the [Call24x7.AI Developer Portal](https://call24x7.ai/developer) and obtain your API key.
 
-## Core Features
+2. **Add Call24x7.AI to Zapier**: 
+   - Go to [Zapier's App Directory](https://zapier.com/apps)
+   - Search for "Call24x7" or use the HTTP/Webhooks integration
+   - Configure your API key in the authentication settings
 
-<CardGroup cols={3}>
-  <Card
-    title="Smart Outbound Calling"
-    icon="rocket"
-    href="#"
-  >
-    Schedule, initiate, and personalize outbound calls to connect with customers, manage campaigns, or streamline operations.
-  </Card>
-  <Card
-    title="Configurable Inbound Numbers"
-    icon="phone"
-    href="#"
-  >
-    Establish dedicated inbound lines for customer support, sales, or other key services with intelligent routing.
-  </Card>
-  <Card
-    title="Real-Time API Interactions"
-    icon="sync"
-    href="#"
-  >
-    Execute live API calls within conversations, enabling responsive actions like order verification and data retrieval.
-  </Card>
-  <Card
-    title="Structured Data Extraction"
-    icon="database"
-    href="#"
-  >
-    Capture structured data from conversations to power CRM updates, analytics, and deeper customer insights.
-  </Card>
-  <Card
-    title="Scalable Campaigns"
-    icon="bullhorn"
-    href="#"
-  >
-    Launch high-volume call campaigns, reaching thousands of customers simultaneously with targeted messaging.
-  </Card>
-  <Card
-    title="Custom Voice Model Fine-Tuning"
-    icon="brain"
-    href="#"
-  >
-    Adapt an LLM to your specific data to create highly personalized, responsive interactions.
-  </Card>
-</CardGroup>
+### Available Triggers
 
-<Divider />
+- **New Call Completed**: Trigger when a call finishes
+- **Call Status Changed**: Trigger when call status updates
+- **Webhook Received**: Receive webhook events from Call24x7.AI
 
+### Available Actions
 
-<TabGroup>
-  <Tab title="Advanced Features">
-  Explore advanced functionalities such as real-time in-call actions, secure data handling, and extensive reporting features.
-  </Tab>
-  <Tab title="Integration Options">
-  Connect Call24x7.AI to existing CRM and support systems for smooth workflow integration.
-  </Tab>
-  <Tab title="Compliance & Security">
-  Ensure GDPR and HIPAA compliance with built-in security protocols, ensuring data safety.
-  </Tab>
-</TabGroup>
+- **Make Outbound Call**: Initiate a phone call using an AI agent
+- **Get Call Status**: Retrieve the current status of a call
+- **Create Agent**: Create a new AI agent programmatically
 
-## Enterprise Solutions
+### Example Zapier Workflow
 
-<CardGroup cols={2}>
-  <Card
-    title="Analytics and Reporting"
-    icon="chart-line"
-    href="#"
-  >
-    Access detailed call performance reports and analytics for a complete view of engagement metrics and trends.
-  </Card>
-  <Card
-    title="Custom Integrations"
-    icon="plug"
-    href="#"
-  >
-    Seamlessly integrate with CRM, ERP, and other tools to streamline your workflows.
-  </Card>
-</CardGroup>
+**Scenario**: Automatically call customers when a new order is placed
 
-<Callout title="Want a tailored solution?" type="success">
-Connect with our team to explore a customized Call24x7.AI plan tailored to your enterprise needs.
-</Callout>
+<Steps>
+  <Step title="Trigger: New Order">
+    Set up a trigger from your e-commerce platform (Shopify, WooCommerce, etc.) for new orders.
+  </Step>
+  <Step title="Action: Make Outbound Call">
+    Configure Call24x7.AI to call the customer's phone number with a personalized message about their order.
+  </Step>
+  <Step title="Action: Update CRM">
+    After the call completes, update your CRM with call results and customer feedback.
+  </Step>
+</Steps>
+
+### Authentication
+
+When setting up Call24x7.AI in Zapier, you'll need to provide:
+
+- **API Key**: Your Call24x7.AI API key
+- **Base URL**: `https://api.call24x7.ai`
+
+<Warning>
+  Keep your API key secure. Never share it publicly or commit it to version control.
+</Warning>
+
+## Make.com Integration
+
+### Getting Started
+
+1. **Get Your API Key**: Sign up at the [Call24x7.AI Developer Portal](https://call24x7.ai/developer) and obtain your API key.
+
+2. **Add Call24x7.AI to Make.com**:
+   - Go to Make.com and create a new scenario
+   - Add an HTTP module
+   - Configure it to use Call24x7.AI's REST API
+
+### HTTP Module Configuration
+
+For making outbound calls, use the following configuration:
+
+**Method**: `POST`  
+**URL**: `https://api.call24x7.ai/outbound_call`  
+**Headers**:
+```
+Authorization: Bearer YOUR_API_KEY
+Content-Type: application/json
+```
+
+**Body**:
+```json
+{
+  "to_phone_number": "+1234567890",
+  "agent_id": "your-agent-id",
+  "webhook_url": "https://your-webhook-url.com/call-complete"
+}
+```
+
+### Example Make.com Scenario
+
+**Scenario**: Send follow-up calls after support tickets are resolved
+
+<Steps>
+  <Step title="Trigger: Ticket Resolved">
+    Set up a trigger from your support system (Zendesk, Freshdesk, etc.) when a ticket is marked as resolved.
+  </Step>
+  <Step title="HTTP Request: Make Call">
+    Use Make.com's HTTP module to call the customer and ask for feedback on their support experience.
+  </Step>
+  <Step title="Parse Webhook Response">
+    When the call completes, parse the webhook data and store it in your database.
+  </Step>
+</Steps>
+
+## Webhook Configuration
+
+Both Zapier and Make.com can receive webhooks from Call24x7.AI when calls complete. Configure webhooks in your call requests:
+
+```json
+{
+  "to_phone_number": "+1234567890",
+  "agent_id": "your-agent-id",
+  "webhook_url": "https://your-zapier-or-make-webhook-url.com"
+}
+```
+
+### Webhook Payload
+
+When a call completes, Call24x7.AI will send a POST request to your webhook URL with the following data:
+
+```json
+{
+  "call_id": "12345",
+  "status": "COMPLETED",
+  "call_direction": "outbound",
+  "from_phone_number": "+1234567890",
+  "to_phone_number": "+0987654321",
+  "agent_id": "agent-123",
+  "duration_seconds": 180,
+  "recording_url": "https://...",
+  "transcription": "Full call transcription...",
+  "output_parameters": "{\"appointment_scheduled\": true}"
+}
+```
+
+## Best Practices
+
+<Tip>
+  Always test your integrations in a development environment before deploying to production.
+</Tip>
+
+1. **Error Handling**: Set up error handling for failed API calls
+2. **Rate Limiting**: Be mindful of API rate limits when making multiple calls
+3. **Data Privacy**: Ensure compliance with data protection regulations (GDPR, TCPA, etc.)
+4. **Testing**: Use test phone numbers and agents before going live
+
+## Support
+
+Need help with your integration? 
+
+- Visit our [Help Center](https://call24x7.ai/help)
+- Contact support: support@call24x7.ai
+- Check the [API Reference](/api-reference) for detailed endpoint documentation
